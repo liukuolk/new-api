@@ -87,17 +87,17 @@ func LogStartupSuccess(startTime time.Time, host, port string) {
 		if ip.IsLoopback() {
 			label = LogText("Local:")
 		}
-		fmt.Fprintf(gin.DefaultWriter, "  ➜  \033[1m%-8s\033[0m http://%s/\n", label, net.JoinHostPort(host, port))
+		fmt.Fprintf(gin.DefaultWriter, "  ➜  \033[1m%-8s\033[0m http://%s%s/\n", label, net.JoinHostPort(host, port), BasePath)
 		fmt.Fprintf(gin.DefaultWriter, "\n")
 		return
 	}
 
 	if !IsRunningInContainer() {
-		fmt.Fprintf(gin.DefaultWriter, "  ➜  \033[1m%-8s\033[0m http://localhost:%s/\n", LogText("Local:"), port)
+		fmt.Fprintf(gin.DefaultWriter, "  ➜  \033[1m%-8s\033[0m http://localhost:%s%s/\n", LogText("Local:"), port, BasePath)
 	}
 
 	for _, ip := range networkIps {
-		fmt.Fprintf(gin.DefaultWriter, "  ➜  \033[1m%-8s\033[0m http://%s:%s/\n", LogText("Network:"), ip, port)
+		fmt.Fprintf(gin.DefaultWriter, "  ➜  \033[1m%-8s\033[0m http://%s:%s%s/\n", LogText("Network:"), ip, port, BasePath)
 	}
 
 	fmt.Fprintf(gin.DefaultWriter, "\n")

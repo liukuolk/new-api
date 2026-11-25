@@ -36,7 +36,22 @@ func SetWebRouter(router *gin.Engine, assets WebAssets, pluginDispatcher gin.Han
 		middleware.Cache(),
 		middleware.ServeFrontendFiles(frontendFS),
 		func(c *gin.Context) {
-			if strings.HasPrefix(c.Request.RequestURI, "/v1") || strings.HasPrefix(c.Request.RequestURI, "/api") || strings.HasPrefix(c.Request.RequestURI, "/assets") {
+			// BasePathHandler has already stripped the configured prefix from
+			// URL.Path and RequestURI, so gin's registered group prefixes
+			// (/v1, /api, /mj, /assets, …) can be matched directly.
+			path := c.Request.URL.Path
+			if strings.HasPrefix(path, "/.well-known/") {
+				// RFC 8615 well-known URIs (for example Chrome's DevTools
+				// workspace probe) must not fall through to the SPA index page.
+				c.Status(http.StatusNotFound)
+				return
+			}
+			if strings.HasPrefix(path, "/v1") ||
+				strings.HasPrefix(path, "/api") ||
+				strings.HasPrefix(path, "/assets") ||
+				strings.HasPrefix(path, "/mj") ||
+				strings.HasPrefix(path, "/google") ||
+				strings.HasPrefix(path, "/v1beta") {
 				controller.RelayNotFound(c)
 				return
 			}

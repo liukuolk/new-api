@@ -238,8 +238,9 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    net.JoinHostPort(host, port),
-		Handler: server,
+		Addr: net.JoinHostPort(host, port),
+		// Strip the configured base path before Gin matches any route.
+		Handler: middleware.BasePathHandler(server),
 	}
 
 	go func() {

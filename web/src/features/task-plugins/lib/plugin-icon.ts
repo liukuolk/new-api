@@ -16,6 +16,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { withBasePath } from '@/lib/app-base'
+
 export type PluginIconDescriptor =
   | { kind: 'lobe'; name: string }
   | { kind: 'image'; src: string }
@@ -27,7 +29,7 @@ export type PluginIconDescriptor =
  * loads them like any other image.
  */
 export function pluginIconUrl(key: string, version?: string): string {
-  const base = `/api/plugin/task/${encodeURIComponent(key)}/icon`
+  const base = withBasePath(`/api/plugin/task/${encodeURIComponent(key)}/icon`)
   return version ? `${base}?version=${encodeURIComponent(version)}` : base
 }
 

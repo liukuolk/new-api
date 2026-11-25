@@ -36,6 +36,12 @@ var SessionSecret = uuid.New().String()
 var CryptoSecret = uuid.New().String()
 var SessionCookieSecure = false
 
+// BasePath is the URL prefix used when the gateway mounts this server under
+// a sub-path (e.g. /aigateway). It is empty for root deployments. When set,
+// the BasePathHandler strips it from incoming URLs before Gin matches routes,
+// and cookie Paths are prefixed with it.
+var BasePath string
+
 // DefaultLanguage is the DEFAULT_LANGUAGE environment variable: the language of
 // server log lines and of text for a reader who states no language: en, zh-CN
 // or zh-TW. English when empty.

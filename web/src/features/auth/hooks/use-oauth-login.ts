@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { clearAuthentication } from '@/lib/api'
+import { getAppBaseUrl } from '@/lib/app-base'
 import { handleServerError } from '@/lib/handle-server-error'
 import { AuthOperationError } from '@/lib/secure-verification'
 import { createServerError } from '@/lib/server-error-message'
@@ -204,7 +205,7 @@ export function useOAuthLogin(
       const state = await createOAuthFlow(provider.slug, 'login')
       rememberOAuthLoginRedirect(state, redirectTo)
 
-      const redirectUri = `${window.location.origin}/oauth/${provider.slug}`
+      const redirectUri = `${getAppBaseUrl()}/oauth/${provider.slug}`
       const url = new URL(provider.authorization_endpoint)
       url.searchParams.set('client_id', provider.client_id)
       url.searchParams.set('redirect_uri', redirectUri)

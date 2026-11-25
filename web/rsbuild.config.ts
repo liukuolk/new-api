@@ -8,12 +8,25 @@ import { tanstackRouter } from '@tanstack/router-plugin/rspack'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+const DEFAULT_BASE_PATH = '/aigateway/'
+
+// `/aigateway/` -> `/aigateway`, `/` or '' -> '' (root deployment).
+function normalizeBasePath(value: string | undefined): string {
+  const trimmed = (value ?? '').trim().replaceAll(/^\/+|\/+$/g, '')
+  return trimmed ? `/${trimmed}` : ''
+}
+
 export default defineConfig(({ envMode }) => {
   const env = loadEnv({ mode: envMode, prefixes: ['VITE_'] })
   const serverUrl =
     process.env.VITE_REACT_APP_SERVER_URL ||
     env.rawPublicVars.VITE_REACT_APP_SERVER_URL ||
     'http://localhost:3000'
+  const basePath = normalizeBasePath(
+    process.env.VITE_BASE_PATH ||
+      env.rawPublicVars.VITE_BASE_PATH ||
+      DEFAULT_BASE_PATH
+  )
 
   const isProd = envMode === 'production'
   const devProxy = Object.fromEntries(
@@ -72,6 +85,11 @@ export default defineConfig(({ envMode }) => {
       proxy: devProxy,
     },
     output: {
+      // Sub-path deployment: the console is served under /aigateway/ and the
+      // gateway strips the prefix before forwarding to the Go server. Client
+      // code reads this value back via import.meta.env.ASSET_PREFIX.
+      // Root deployments can build with VITE_BASE_PATH=/.
+      ...(isProd ? { assetPrefix: `${basePath}/` } : {}),
       // Production optimizations
       minify: isProd,
       target: 'web',
